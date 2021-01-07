@@ -1,0 +1,51 @@
+* tab-bar-groups.el
+
+Tab groups for the tab bar.
+
+Tabs with the same base name (=foo=, =foo<1>=, =foo<2>= all share the
+base name "foo") are considered a group.
+
+This package provides convenient commands to create and work with tabs
+in groups (see below).
+
+* Installation
+
+If you use MELPA, an easy way to install this package is via
+=package-install=. Alternatively, download =tab-bar-groups.el=, put it
+in your =load-path= and =require= it.
+
+If you use both MELPA and =use-package=, you can use this, too:
+
+#+begin_src emacs-lisp
+(use-package tab-bar-groups
+  :ensure t)
+#+end_src
+
+* Commands
+
+Table of available commands and their description.
+
+| Command                                 | Description                                                                       |
+|-----------------------------------------+-----------------------------------------------------------------------------------|
+| =tab-bar-groups-new-tab=                | Call =tab-bar-new-tab=, ensure new tab has a unique name.                         |
+| =tab-bar-groups-duplicate-tab=          | Duplicate current tab with a unique name.                                         |
+| =tab-bar-groups-uniquify-tab-name=      | Make current tab name unique (=foo=, =foo<1>=, =foo<2>=, ...).                    |
+| =tab-bar-groups-close-tab-group=        | Close all tabs of the current tab group.                                          |
+| =tab-bar-groups-close-tab-or-tab-group= | Close current tab; with prefix argument, close all tabs of the current tab group. |
+
+* Recommended Keybindings
+
+Note that this package doesn't bind any keys by itself.
+
+In my local configuration, I added bindings for the above commands to
+the pre-existing keymap for tab-related commands (=C-x t=):
+ 
+#+begin_src emacs-lisp
+(use-package tab-bar-groups
+  :ensure t
+  :bind (:map tab-prefix-map
+              ("0" . tab-bar-groups-close-tab-or-tab-group) ;; shadows `tab-bar-close-tab`
+              ("2" . tab-bar-groups-new-tab) ;; shadows `tab-bar-new-tab`
+              ("d" . tab-bar-groups-duplicate-tab) ;; shadows `dired-other-tab`
+              ("u" . tab-bar-groups-uniquify-tab-name)))
+#+end_src
