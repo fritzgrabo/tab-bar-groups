@@ -5,7 +5,7 @@
 ;; Author: Fritz Grabo <me@fritzgrabo.com>
 ;; URL: https://github.com/fritzgrabo/tab-bar-groups
 ;; Version: 0.1
-;; Package-Requires: ((emacs "27.1") (tab-bar-utils "0.1") (s "1.12.0"))
+;; Package-Requires: ((emacs "27.1") (s "1.12.0"))
 ;; Keywords: convenience
 
 ;; This file is not part of GNU Emacs.
@@ -37,12 +37,11 @@
 
 (require 'seq)
 
-(require 'tab-bar-utils)
 (require 's)
 
 (defun tab-bar-groups--tab-group-name (&optional tab)
   "Return the group name of TAB (or current tab's name if nil)."
-  (s-replace-regexp "<[[:digit:]]+>$" "" (tab-bar-utils-tab-name tab)))
+  (s-replace-regexp "<[[:digit:]]+>$" "" (alist-get 'name (or tab (tab-bar--current-tab)))))
 
 (defun tab-bar-groups--same-tab-group-p (tab1 tab2)
   "Check whether TAB1 and TAB2 are in the same group."
@@ -58,9 +57,9 @@
 (defun tab-bar-groups-uniquify-tab-name (&optional reference-tab)
   "Make current tab name unique, with a base name derived from the group name of REFERENCE-TAB (or current tab if nil)."
   (interactive)
-  (let* ((current-tab-name (tab-bar-utils-tab-name))
+  (let* ((current-tab-name (alist-get 'name (tab-bar--current-tab)))
          (tab-group-name (tab-bar-groups--tab-group-name reference-tab))
-         (tab-group-tab-names (seq-map #'tab-bar-utils-tab-name (tab-bar-groups--tabs-in-group reference-tab)))
+         (tab-group-tab-names (seq-map (lambda (tab) (alist-get 'name tab)) (tab-bar-groups--tabs-in-group reference-tab)))
          (tab-name-function (lambda (base num) (format "%s<%i>" base num))))
     (if (or (and (string-equal current-tab-name tab-group-name) (= 1 (length tab-group-tab-names)))
             (not (member tab-group-name tab-group-tab-names)))
@@ -100,7 +99,7 @@ If prefix argument is given, calls `tab-bar-groups-close-tab-group` with ARGS in
   (interactive)
   (let* ((tab-group-tabs (seq-filter (lambda (tab) (tab-bar-groups--same-tab-group-p reference-tab tab)) (funcall tab-bar-tabs-function))))
     (dolist (tab tab-group-tabs)
-      (tab-bar-close-tab-by-name (tab-bar-utils-tab-name tab)))))
+      (tab-bar-close-tab-by-name (alist-get 'name tab)))))
 
 (provide 'tab-bar-groups)
 ;;; tab-bar-groups.el ends here
