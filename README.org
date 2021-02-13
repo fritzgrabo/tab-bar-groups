@@ -44,8 +44,8 @@ the pre-existing keymap for tab-related commands (=C-x t=):
 (use-package tab-bar-groups
   :ensure t
   :bind (:map tab-prefix-map
-              ("0" . tab-bar-groups-close-tab-or-tab-group) ;; shadows `tab-bar-close-tab`
-              ("2" . tab-bar-groups-new-tab) ;; shadows `tab-bar-new-tab`
-              ("d" . tab-bar-groups-duplicate-tab) ;; shadows `dired-other-tab`
+              ("0" . tab-bar-groups-close-tab-or-tab-group) ;; shadows `tab-bar-close-tab'
+              ("2" . tab-bar-groups-new-tab) ;; shadows `tab-bar-new-tab'
+              ("d" . tab-bar-groups-duplicate-tab) ;; shadows `dired-other-tab'
               ("u" . tab-bar-groups-uniquify-tab-name)))
 #+end_src

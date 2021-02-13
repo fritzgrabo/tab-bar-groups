@@ -27,7 +27,7 @@
 
 ;; Tab groups for the tab bar.
 
-;; Tabs with the same base name (`foo`, `foo<1>`, `foo<2>` all share the
+;; Tabs with the same base name ("foo", "foo<1>", "foo<2>" all share the
 ;; base name "foo") are considered a group.
 
 ;; This package provides convenient commands to create and work with
@@ -75,19 +75,19 @@
   "Duplicate current tab with a unique name."
   (interactive)
   (let ((source-tab (tab-bar--current-tab))
-        (tab-bar-new-tab-choice nil)) ;; `nil` means: duplicate tab contents.
+        (tab-bar-new-tab-choice nil)) ;; nil means: duplicate tab contents.
     (tab-bar-new-tab)
     (tab-bar-groups-uniquify-tab-name source-tab)))
 
 (defun tab-bar-groups-new-tab (&rest args)
-  "Call `tab-bar-new-tab` with the given ARGS, ensure new tab has a unique name."
+  "Call `tab-bar-new-tab' with the given ARGS, ensure new tab has a unique name."
   (interactive)
   (tab-bar-new-tab args)
   (tab-bar-groups-uniquify-tab-name))
 
 (defun tab-bar-groups-close-tab-or-tab-group (&rest args)
-  "Dispatch to `tab-bar-close-tab`, passing along ARGS.
-If prefix argument is given, calls `tab-bar-groups-close-tab-group` with ARGS instead."
+  "Dispatch to `tab-bar-close-tab', passing along ARGS.
+If prefix argument is given, calls `tab-bar-groups-close-tab-group' with ARGS instead."
   (interactive)
   (apply (if current-prefix-arg
              #'tab-bar-groups-close-tab-group
