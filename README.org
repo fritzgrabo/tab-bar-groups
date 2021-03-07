@@ -2,36 +2,48 @@
 
 Tab groups for the tab bar.
 
-Tabs with the same base name (=foo=, =foo<1>=, =foo<2>= all share the
-base name "foo") are considered a group.
-
-This package provides convenient commands to create and work with tabs
-in groups (see below).
+This package provides convenient commands to create and work with groups
+of tabs (see below for screenshots and commands).
 
 * Installation
 
 If you use MELPA, an easy way to install this package is via
 =package-install=. Alternatively, download =tab-bar-groups.el=, put it
-in your =load-path= and =require= it.
+it in your =load-path= and =require= it. Finally, use
+=(tab-bar-groups-activate)= or =M-x tab-bar-groups-activate= to turn on
+the provided features.
 
 If you use both MELPA and =use-package=, you can use this, too:
 
 #+begin_src emacs-lisp
 (use-package tab-bar-groups
-  :ensure t)
+  :ensure t
+  :config
+  (tab-bar-groups-activate))
 #+end_src
+
+* Screenshots
+
+Showing a bunch of tabs in 3 groups =Emacs=, =News=, =TBG=. The faces
+applied to the group names and the tabs in groups are fully
+customizable. Note that the =*scratch*= tab (unstyled) is not part of a
+group.
+
+[[screenshots/tab-bar-groups.png]]
 
 * Commands
 
 Table of available commands and their description.
 
-| Command                                 | Description                                                                       |
-|-----------------------------------------+-----------------------------------------------------------------------------------|
-| =tab-bar-groups-new-tab=                | Call =tab-bar-new-tab=, ensure new tab has a unique name.                         |
-| =tab-bar-groups-duplicate-tab=          | Duplicate current tab with a unique name.                                         |
-| =tab-bar-groups-uniquify-tab-name=      | Make current tab name unique (=foo=, =foo<1>=, =foo<2>=, ...).                    |
-| =tab-bar-groups-close-tab-group=        | Close all tabs of the current tab group.                                          |
-| =tab-bar-groups-close-tab-or-tab-group= | Close current tab; with prefix argument, close all tabs of the current tab group. |
+| Command                        | Description                                                                  |
+|--------------------------------+------------------------------------------------------------------------------|
+| =tab-bar-groups-new-tab=       | Create a new tab in the current group.                                       |
+| =tab-bar-groups-duplicate-tab= | Duplicate current tab in its group.                                          |
+| =tab-bar-groups-assign-group=  | Assign a group to the current tab (query name w/ completion).                |
+| =tab-bar-groups-rename-group=  | Rename the group that the current tab belongs to (query name w/ completion). |
+| =tab-bar-groups-eject-tab=     | Eject the current tab from its group.                                        |
+| =tab-bar-groups-close-group=   | Close all tabs of the current group.                                         |
+| =tab-bar-groups-regroup-tabs=  | Re-order tabs so that all tabs of each group are next to each other.         |
 
 * Recommended Keybindings
 
@@ -43,9 +55,48 @@ the pre-existing keymap for tab-related commands (=C-x t=):
 #+begin_src emacs-lisp
 (use-package tab-bar-groups
   :ensure t
+  :demand t
+  :config
+  (tab-bar-groups-activate)
   :bind (:map tab-prefix-map
-              ("0" . tab-bar-groups-close-tab-or-tab-group) ;; shadows `tab-bar-close-tab'
-              ("2" . tab-bar-groups-new-tab) ;; shadows `tab-bar-new-tab'
-              ("d" . tab-bar-groups-duplicate-tab) ;; shadows `dired-other-tab'
-              ("u" . tab-bar-groups-uniquify-tab-name)))
+              ("g0" . tab-bar-groups-close-group)
+              ("g2" . tab-bar-groups-new-tab)
+              ("ga" . tab-bar-groups-assign-group)
+              ("gg" . tab-bar-groups-regroup-tabs)
+              ("gd" . tab-bar-groups-duplicate-tab)
+              ("gk" . tab-bar-groups-eject-tab)
+              ("gr" . tab-bar-groups-rename-group)))
+#+end_src
+
+* Extensibility
+
+This package was built with extensibility in mind. In fact, it's an
+extraction of a bigger suite of features that I use locally to enable a
+"one tab group per project" workflow.
+
+If you want to change how new tabs pick their appearance/color, or how
+grouped tabs render in the tab bar, have a look at the various extension
+points of this package:
+
+- =tab-bar-groups-appearances=
+- =tab-bar-groups-apply-group-appearance-to-tab-name-function=
+- =tab-bar-groups-pick-group-appearance-function=
+
+* Integration with tab-bar-echo-area
+
+This package provides an integration with the [[https://github.com/fritzgrabo/tab-bar-echo-area][tab-bar-echo-area]] package.
+
+[[screenshots/tab-bar-groups-tab-bar-echo-area.png]]
+
+After both packages have been loaded, use
+=(tab-bar-groups-activate-for-tab-bar-echo-area)= to enable it.
+
+#+begin_src emacs-lisp
+(use-package tab-bar-groups
+  :ensure t
+  :config
+  (tab-bar-groups-activate)
+
+  (with-eval-after-load 'tab-bar-echo-area
+    (tab-bar-groups-activate-for-tab-bar-echo-area)))
 #+end_src
