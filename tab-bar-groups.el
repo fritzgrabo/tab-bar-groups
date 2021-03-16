@@ -4,7 +4,7 @@
 
 ;; Author: Fritz Grabo <me@fritzgrabo.com>
 ;; URL: https://github.com/fritzgrabo/tab-bar-groups
-;; Version: 0.1
+;; Version: 0.2
 ;; Package-Requires: ((emacs "27.1") (s "1.12.0"))
 ;; Keywords: convenience
 
