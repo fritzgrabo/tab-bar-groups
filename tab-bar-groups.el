@@ -299,7 +299,7 @@ list in `tab-bar-groups-appearances'."
       (nconc result (list (cons key (alist-get key tab)))))
     result))
 
-(defun tab-bar-groups-current-tab-advice (orig-fun &rest args)
+(defun tab-bar-groups--current-tab-advice (orig-fun &rest args)
   "Call ORIG-FUN with ARGS, then inject custom properties related to tab groups."
   (let ((result (apply orig-fun args))
         (tab (or (car args) (assq 'current-tab (frame-parameter (cadr args) 'tabs)))))
@@ -332,7 +332,7 @@ list in `tab-bar-groups-appearances'."
 
   ;; Install advice.
   (advice-add #'tab-bar--tab :around #'tab-bar-groups--tab-advice)
-  (advice-add #'tab-bar--current-tab :around #'tab-bar-groups-current-tab-advice)
+  (advice-add #'tab-bar--current-tab :around #'tab-bar-groups--current-tab-advice)
   (advice-add #'tab-bar-make-keymap-1 :filter-return #'tab-bar-groups--make-keymap-1-advice)
 
   (dolist (f tab-bar-groups-trigger-reindex-functions)
