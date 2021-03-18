@@ -77,7 +77,8 @@ the pre-existing keymap for tab-related commands (=C-x t=):
               ("gr" . tab-bar-groups-rename-group)))
 #+end_src
 
-* Extensibility
+* Building on top of this package
+** Extensibility
 
 This package was built with extensibility in mind. In fact, it's an
 extraction of a bigger suite of features that I use locally to enable a
@@ -90,6 +91,49 @@ points of this package:
 - =tab-bar-groups-appearances=
 - =tab-bar-groups-apply-group-appearance-to-tab-name-function=
 - =tab-bar-groups-pick-group-appearance-function=
+
+** Helper functions to roll your own tools
+
+There's also a range of helper functions that you can use to find out
+about existing groups, their names, etc.
+
+For example, here's a function I use locally to quickly create/navigate
+tab groups for projects. In a gist, it ...
+
+- queries the user for a project from magit's list of known repositories
+- derives the tab group name from either a [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Directory-Local-Variables.html][dir-local variable]] named
+  =tab-bar-group-name= or the repository name
+- finds the tab group with that name and switches to its first tab, or,
+  if no such tab group exists,
+- creates a new tab group with that name and opens magit status.
+
+#+begin_src lisp
+(defun switch-to-project ()
+  "Switch to project."
+  (interactive)
+  (let* ((repositories (magit-repos-alist)) ;; ((name . dir) ...)
+         (repository (assoc (completing-read "Git repository: " repositories) repositories))
+         (tab-bar-group-names (tab-bar-groups-distinct-group-names))
+         (tab-bar-group-name
+          (or (with-temp-buffer
+                (setq default-directory (cdr repository))
+                (hack-dir-local-variables-non-file-buffer)
+                (and (boundp 'tab-bar-group-name) tab-bar-group-name))
+              (car repository))))
+    (if (member tab-bar-group-name tab-bar-group-names)
+        (tab-bar-select-tab
+         (1+ (seq-position
+              (funcall tab-bar-tabs-function)
+              (seq-first (alist-get (intern tab-bar-group-name) (tab-bar-groups-parse-groups))))))
+      (tab-bar-new-tab)
+      (tab-bar-groups-assign-group tab-bar-group-name))
+    (magit-status (cdr repository))))
+
+;; Add this if you use `tab-bar-echo-area'.
+(when (featurep 'tab-bar-echo-area)
+  (push #'switch-to-project tab-bar-echo-area-trigger-display-functions)
+  (tab-bar-echo-area-apply-display-tab-names-advice))
+#+end_src
 
 * Integration with tab-bar-echo-area
 
