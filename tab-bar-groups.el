@@ -348,7 +348,7 @@ list in `tab-bar-groups-appearances'."
   (when (featurep 'tab-bar-echo-area)
     (when (boundp 'tab-bar-echo-area-process-tab-name-functions)
       (unless (member tab-bar-groups-apply-group-appearance-to-tab-name-function tab-bar-echo-area-process-tab-name-functions)
-        (push tab-bar-groups-apply-group-appearance-to-tab-name-function tab-bar-echo-area-process-tab-name-functions)))
+        (nconc tab-bar-echo-area-process-tab-name-functions (list tab-bar-groups-apply-group-appearance-to-tab-name-function))))
 
     (when (boundp 'tab-bar-echo-area-trigger-display-functions)
       (dolist (f '(tab-bar-groups-duplicate-tab
