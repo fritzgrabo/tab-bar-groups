@@ -6,13 +6,12 @@ This package provides convenient commands to create and work with groups
 of tabs (see below for screenshots and commands).
 
 *Note about tab groups in Emacs 28.1*: as I release v0.2 of this
-package, the notion of tab grouping has [[https://git.savannah.gnu.org/cgit/emacs.git/commit/etc/NEWS?id=f9b737fb9d21ac7adff403274167e76e77d033b8][made its way into Emacs]], too.
-That's bad timing on my end, I guess ;) There's a good chance that
-Emacs' idea of tab grouping and what this package aims to provide go
-together well. If that's the case, I'll rework mine to use the
-facilities that Emacs then provides. In the meantime (or if you're stuck
-on Emacs 27.1), please feel free to explore this package as an
-alternative to, or a variation of Emacs tab grouping.
+package, the notion of tab grouping has [[https://git.savannah.gnu.org/cgit/emacs.git/commit/etc/NEWS?id=f9b737fb9d21ac7adff403274167e76e77d033b8][made its way into the upcoming
+Emacs 28]], too. It seems like Emacs' ideas and the ones that drive the
+hacks that enable this package are somewhat similar: I'll eventually
+rework this package to reuse the facilities that Emacs 28 will then
+provide, and continue to use said hacks in case it finds itself running
+in Emacs 27.
 
 * Installation
 
