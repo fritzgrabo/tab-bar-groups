@@ -75,11 +75,11 @@ When 'all, show the group name on all tabs of a group.")
   (dolist (color '("dark blue"
                    "dark red"
                    "dark green"
-                   "orange red"
-                   "dark violet"
-                   "dark goldenrod"
+                   "dark orange"
+                   "steel blue"
+                   "medium violet red"
                    "dark cyan"
-                   "dark magenta"))
+                   "saddle brown"))
     (eval (macroexpand `(defface ,(intern (format "tab-bar-groups-%i" i)) '((t :foreground ,color)) ,(format "Face to use for tab bar groups (%i)." i))))
     (eval (macroexpand `(defface ,(intern (format "tab-bar-groups-%i-group-name" i)) '((t :inverse-video t :foreground ,color)) ,(format "Face to use for tab bar group names (%i)." i))))
     (setq i (1+ i))))
