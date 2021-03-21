@@ -77,19 +77,28 @@ the pre-existing keymap for tab-related commands (=C-x t=):
 #+end_src
 
 * Building on top of this package
-** Extensibility
+** Extensibility and customizability
 
 This package was built with extensibility in mind. In fact, it's an
 extraction of a bigger suite of features that I use locally to enable a
 "one tab group per project" workflow.
 
-If you want to change how new tabs pick their appearance/color, or how
-grouped tabs render in the tab bar, have a look at the various extension
-points of this package:
+If you want to change how new tabs pick their appearance/color, how
+grouped tabs render in the tab bar or what happens after a tab's group
+assignment has changed, have a look at the various extension points of
+this package:
 
 - =tab-bar-groups-appearances=
 - =tab-bar-groups-apply-group-appearance-to-tab-name-function=
 - =tab-bar-groups-pick-group-appearance-function=
+- =tab-bar-groups-tab-post-group-assignment-functions= (an [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Hooks.html][abnormal hook]])
+
+For example, to keep all tabs of each group next to each other at all
+times:
+
+#+begin_src emacs-lisp
+(add-hook 'tab-bar-groups-tab-post-group-assignment-functions #'tab-bar-groups-regroup-tabs)
+#+end_src
 
 ** Helper functions to roll your own tools
 

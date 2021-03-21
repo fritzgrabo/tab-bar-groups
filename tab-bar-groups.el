@@ -110,6 +110,14 @@ When 'all, show the group name on all tabs of a group.")
   '(group-name group-index group-appearance)
   "List of custom tab group related properties to preserve/copy in tabs.")
 
+(defvar tab-bar-groups-tab-post-group-assignment-functions
+  nil
+  "List of functions to call after changing the group assignment of a tab.
+
+The updated tab is supplied as an argument. Note that ejecting a
+tab from its group (that is, changing its assignment to nil) will
+also trigger this hook.")
+
 (defun tab-bar-groups-current-tab ()
   "Retrieve original data about the current tab of the current frame."
   (assq 'current-tab (funcall tab-bar-tabs-function)))
@@ -122,7 +130,9 @@ When 'all, show the group name on all tabs of a group.")
               (not (equal value (cdr entry))))
       (if entry
           (setf (alist-get key tab) value)
-        (nconc tab (list (cons key value)))))))
+        (nconc tab (list (cons key value))))
+      (if (equal key 'group-name)
+          (run-hook-with-args 'tab-bar-groups-tab-post-group-assignment-functions tab)))))
 
 (defun tab-bar-groups--reindex-tabs ()
   "Re-assign group-index to all tabs in groups."
@@ -266,8 +276,12 @@ list in `tab-bar-groups-appearances'."
 
 (defalias 'tab-bar-groups-close-tab-group 'tab-bar-groups-close-group)
 
-(defun tab-bar-groups-regroup-tabs ()
-  "Re-order tabs so that all tabs of each group are next to each other."
+(defun tab-bar-groups-regroup-tabs (&rest _args)
+  "Re-order tabs so that all tabs of each group are next to each other.
+
+Accepts, but ignores any arguments so it can be used as-is in the
+`tab-bar-groups-tab-post-group-assignment-functions' abnormal
+hook in order to keep tabs grouped at all times."
   (interactive)
   (let* ((tabs (apply #'append (seq-map #'cdr (tab-bar-groups-parse-groups)))))
     (dotimes (i (length tabs))
