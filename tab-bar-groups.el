@@ -346,7 +346,9 @@ hook in order to keep tabs grouped at all times."
 
   ;; Install advice.
   (advice-add #'tab-bar--tab :around #'tab-bar-groups--tab-advice)
-  (advice-add #'tab-bar--current-tab :around #'tab-bar-groups--current-tab-advice)
+  (if (fboundp 'tab-bar--current-tab-make)
+      (advice-add #'tab-bar--current-tab-make :around #'tab-bar-groups--current-tab-advice)
+    (advice-add #'tab-bar--current-tab :around #'tab-bar-groups--current-tab-advice))
   (advice-add #'tab-bar-make-keymap-1 :filter-return #'tab-bar-groups--make-keymap-1-advice)
 
   (dolist (f tab-bar-groups-trigger-reindex-functions)
