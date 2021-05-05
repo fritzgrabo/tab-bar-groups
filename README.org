@@ -2,16 +2,17 @@
 
 Tab groups for the tab bar.
 
-This package provides convenient commands to create and work with groups
-of tabs (see below for screenshots and commands).
+This package provides the means to work with and to customize the
+appearance of named groups of tabs in Emacs 27 and higher (see below for
+screenshots and commands).
 
-*Note about tab groups in Emacs 28.1*: as I release v0.2 of this
-package, the notion of tab grouping has [[https://git.savannah.gnu.org/cgit/emacs.git/commit/etc/NEWS?id=f9b737fb9d21ac7adff403274167e76e77d033b8][made its way into the upcoming
-Emacs 28]], too. It seems like Emacs' ideas and the ones that drive the
-hacks that enable this package are somewhat similar: I'll eventually
-rework this package to reuse the facilities that Emacs 28 will then
-provide, and continue to use said hacks in case it finds itself running
-in Emacs 27.
+*Note about tab groups in Emacs 28*: in early 2021, the notion of tab
+grouping [[https://git.savannah.gnu.org/cgit/emacs.git/commit/etc/NEWS?id=f9b737fb9d21ac7adff403274167e76e77d033b8][made its way into the upcoming Emacs 28]]. While this package
+continues to support a somewhat simplified version of tab grouping in
+Emacs 27, it also acknowledges recent developments by realigning its
+internals to use (and enhance) the tab bar group related facilities that
+Emacs 28 provides. If you are on Emacs 28, make sure to get a recent
+nightly.
 
 * Installation
 
@@ -32,26 +33,39 @@ If you use both MELPA and =use-package=, you can use this, too:
 
 * Screenshots
 
-Showing a bunch of tabs in 3 groups =Emacs=, =News=, =TBG=. The faces
-applied to the group names and the tabs in groups are fully
-customizable. Note that the =*scratch*= tab (unstyled) is not part of a
-group.
+Emacs 27, or Emacs 28 without =tab-bar-format-tabs-groups= in
+=tab-bar-format=: Showing a bunch of tabs in three groups =Emacs=,
+=News=, =tbg=, with =init.el= being the current tab and =Emacs= being
+the current group. Note that all tabs of all groups are visible.  Also
+note that the =*scratch*= tab (unstyled) is not part of a group.
 
-[[screenshots/tab-bar-groups.png]]
+[[screenshots/tab-bar-groups-emacs-27.png]]
+
+Emacs 28 with =tab-bar-format-tabs-groups= in =tab-bar-format=: Showing
+the same groups and tabs as above. Note that
+=tab-bar-format-tabs-groups= hides tabs in inactive groups.
+
+[[screenshots/tab-bar-groups-emacs-28.png]]
+
+The faces applied to the current/other tabs and groups are fully
+customizable.
 
 * Commands
 
 Table of available commands and their description.
 
-| Command                        | Description                                                                  |
-|--------------------------------+------------------------------------------------------------------------------|
-| =tab-bar-groups-new-tab=       | Create a new tab in the current group.                                       |
-| =tab-bar-groups-duplicate-tab= | Duplicate current tab in its group.                                          |
-| =tab-bar-groups-assign-group=  | Assign a group to the current tab (query name w/ completion).                |
-| =tab-bar-groups-rename-group=  | Rename the group that the current tab belongs to (query name w/ completion). |
-| =tab-bar-groups-eject-tab=     | Eject the current tab from its group.                                        |
-| =tab-bar-groups-close-group=   | Close all tabs of the current group.                                         |
-| =tab-bar-groups-regroup-tabs=  | Re-order tabs so that all tabs of each group are next to each other.         |
+| Command                           | Description                                                                  |
+|-----------------------------------+------------------------------------------------------------------------------|
+| =tab-bar-groups-new-tab=          | Create a new tab in the current group.¹                                      |
+| =tab-bar-groups-duplicate-tab=    | Duplicate current tab in its group.¹                                        |
+| =tab-bar-groups-change-tab-group= | Change the group of the current tab (query name w/ completion).¹             |
+| =tab-bar-groups-rename-group=     | Rename the group that the current tab belongs to (query name w/ completion). |
+| =tab-bar-groups-eject-tab=        | Eject the current tab from its group.                                        |
+| =tab-bar-groups-close-group-tabs= | Close all tabs of the current group.¹                                        |
+| =tab-bar-groups-regroup-tabs=     | Re-order tabs so that all tabs of each group are next to each other.         |
+
+(1) Required in Emacs 27 only. Emacs 28 provides commands with similar
+functionality natively.
 
 * Recommended Keybindings
 
@@ -59,7 +73,7 @@ Note that this package doesn't bind any keys by itself.
 
 In my local configuration, I added bindings for the above commands to
 the pre-existing keymap for tab-related commands (=C-x t=):
- 
+
 #+begin_src emacs-lisp
 (use-package tab-bar-groups
   :ensure t
@@ -67,9 +81,9 @@ the pre-existing keymap for tab-related commands (=C-x t=):
   :config
   (tab-bar-groups-activate)
   :bind (:map tab-prefix-map
-              ("g0" . tab-bar-groups-close-group)
+              ("g0" . tab-bar-groups-close-group-tabs)
               ("g2" . tab-bar-groups-new-tab)
-              ("ga" . tab-bar-groups-assign-group)
+              ("ga" . tab-bar-groups-change-tab-group)
               ("gg" . tab-bar-groups-regroup-tabs)
               ("gd" . tab-bar-groups-duplicate-tab)
               ("gk" . tab-bar-groups-eject-tab)
@@ -89,15 +103,16 @@ assignment has changed, have a look at the various extension points of
 this package:
 
 - =tab-bar-groups-appearances=
-- =tab-bar-groups-apply-group-appearance-to-tab-name-function=
+- =tab-bar-groups-colors=
 - =tab-bar-groups-pick-group-appearance-function=
-- =tab-bar-groups-tab-post-group-assignment-functions= (an [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Hooks.html][abnormal hook]])
+- =tab-bar-groups-style-tab-name-functions=
+- =tab-bar-groups-tab-post-change-group-functions= (an [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Hooks.html][abnormal hook]])
 
 For example, to keep all tabs of each group next to each other at all
 times:
 
 #+begin_src emacs-lisp
-(add-hook 'tab-bar-groups-tab-post-group-assignment-functions #'tab-bar-groups-regroup-tabs)
+(add-hook 'tab-bar-groups-tab-post-change-group-functions #'tab-bar-groups-regroup-tabs)
 #+end_src
 
 ** Helper functions to roll your own tools
@@ -108,7 +123,7 @@ about existing groups, their names, etc.
 For example, here's a function I use locally to quickly create/navigate
 tab groups for projects. In a gist, it ...
 
-- queries the user for a project from magit's list of known repositories
+- queries the user for a project from [[https://magit.vc][magit]]'s list of known repositories
 - derives the tab group name from either a [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Directory-Local-Variables.html][dir-local variable]] named
   =tab-bar-group-name= or the repository name
 - finds the tab group with that name and switches to its first tab, or,
@@ -120,7 +135,7 @@ tab groups for projects. In a gist, it ...
   "Switch to project."
   (interactive)
   (let* ((repositories (magit-repos-alist)) ;; ((name . dir) ...)
-         (repository (assoc (completing-read "Git repository: " repositories) repositories))
+         (repository (assoc (completing-read "Git repository: " repositories nil t) repositories))
          (tab-bar-group-names (tab-bar-groups-distinct-group-names))
          (tab-bar-group-name
           (or (with-temp-buffer
@@ -134,7 +149,7 @@ tab groups for projects. In a gist, it ...
               (funcall tab-bar-tabs-function)
               (seq-first (alist-get (intern tab-bar-group-name) (tab-bar-groups-parse-groups))))))
       (tab-bar-new-tab)
-      (tab-bar-groups-assign-group tab-bar-group-name))
+      (tab-bar-groups-store-tab-group tab-bar-group-name))
     (magit-status (cdr repository))))
 
 ;; Add this if you use `tab-bar-echo-area'.
@@ -146,6 +161,9 @@ tab groups for projects. In a gist, it ...
 * Integration with tab-bar-echo-area
 
 This package provides an integration with the [[https://github.com/fritzgrabo/tab-bar-echo-area][tab-bar-echo-area]] package.
+
+Tabs and tab groups are rendered like in the tab bar (that is,
+=tab-bar-format= settings apply here as well).
 
 [[screenshots/tab-bar-groups-tab-bar-echo-area.png]]
 
@@ -159,5 +177,5 @@ After both packages have been loaded, use
   (tab-bar-groups-activate)
 
   (with-eval-after-load 'tab-bar-echo-area
-    (tab-bar-groups-activate-for-tab-bar-echo-area)))
+    (tab-bar-groups-activate-for-tab-bar-echo-area))
 #+end_src
