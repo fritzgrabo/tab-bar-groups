@@ -117,44 +117,59 @@ times:
 
 ** Helper functions to roll your own tools
 
-There's also a range of helper functions that you can use to find out
-about existing groups, their names, etc.
+This package provides a range of helper functions that you can use to
+find out about existing groups, their names, etc.
 
-For example, here's a function I use locally to quickly create/navigate
-tab groups for projects. In a gist, it ...
+For an example of their use, have a look at the two functions provided
+below. I use these locally as wrappers around =project-switch-project=
+and =project-kill-buffers= to enable the "one tab group per project"
+workflow I mentioned above.
 
-- queries the user for a project from [[https://magit.vc][magit]]'s list of known repositories
+In a gist, =switch-project= ...
+
+- queries the user for a project from the list of known projects,
 - derives the tab group name from either a [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Directory-Local-Variables.html][dir-local variable]] named
-  =tab-bar-group-name= or the repository name
+  =tab-bar-group-name= or the project's directory name,
 - finds the tab group with that name and switches to its first tab, or,
   if no such tab group exists,
-- creates a new tab group with that name and opens magit status.
+- creates a new tab group with that name and calls
+  =project-switch-project= to open it.
+
+=close-project= runs =project-kill-buffers=, then closes all tabs in the
+project's tab group.
 
 #+begin_src lisp
-(defun switch-to-project ()
-  "Switch to project."
-  (interactive)
-  (let* ((repositories (magit-repos-alist)) ;; ((name . dir) ...)
-         (repository (assoc (completing-read "Git repository: " repositories nil t) repositories))
-         (tab-bar-group-names (tab-bar-groups-distinct-group-names))
-         (tab-bar-group-name
-          (or (with-temp-buffer
-                (setq default-directory (cdr repository))
-                (hack-dir-local-variables-non-file-buffer)
-                (and (boundp 'tab-bar-group-name) tab-bar-group-name))
-              (car repository))))
-    (if (member tab-bar-group-name tab-bar-group-names)
-        (tab-bar-select-tab
-         (1+ (seq-position
-              (funcall tab-bar-tabs-function)
-              (seq-first (alist-get (intern tab-bar-group-name) (tab-bar-groups-parse-groups))))))
+(defun switch-project (project-dir)
+  "Switch to project in PROJECT-DIR."
+  (interactive (list (project-prompt-project-dir)))
+  (let ((tab-bar-group-name
+             (or (with-temp-buffer
+                   (setq default-directory project-dir)
+                   (hack-dir-local-variables-non-file-buffer)
+                   (and (boundp 'tab-bar-group-name) tab-bar-group-name))
+                 (file-name-nondirectory (directory-file-name project-dir)))))
+    (if-let ((tab-bar-group-tabs
+              (alist-get (intern tab-bar-group-name) (tab-bar-groups-parse-groups))))
+        (tab-bar-select-tab (1+ (tab-bar--tab-index (car tab-bar-group-tabs))))
       (tab-bar-new-tab)
-      (tab-bar-groups-store-tab-group tab-bar-group-name))
-    (magit-status (cdr repository))))
+      (tab-bar-groups-store-tab-group tab-bar-group-name)
+      (project-switch-project project-dir))))
+
+(defun close-project ()
+  "Kill project buffers, close project tabs."
+  (interactive)
+  (project-kill-buffers)
+  (tab-bar-groups-close-group (tab-bar-groups-current-tab)))
+
+(use-package project
+  :demand t
+  :bind (:map project-prefix-map
+              ("p" . switch-project)
+              ("k" . close-project)))
 
 ;; Add this if you use `tab-bar-echo-area'.
 (when (featurep 'tab-bar-echo-area)
-  (push #'switch-to-project tab-bar-echo-area-trigger-display-functions)
+  (push #'switch-project tab-bar-echo-area-trigger-display-functions)
   (tab-bar-echo-area-apply-display-tab-names-advice))
 #+end_src
 
