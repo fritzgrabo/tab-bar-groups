@@ -26,7 +26,7 @@ If you use both MELPA and =use-package=, you can use this, too:
 
 #+begin_src emacs-lisp
 (use-package tab-bar-groups
-  :ensure t
+  :ensure
   :config
   (tab-bar-groups-activate))
 #+end_src
@@ -76,8 +76,8 @@ the pre-existing keymap for tab-related commands (=C-x t=):
 
 #+begin_src emacs-lisp
 (use-package tab-bar-groups
-  :ensure t
-  :demand t
+  :ensure
+  :demand
   :config
   (tab-bar-groups-activate)
   :bind (:map tab-prefix-map
@@ -186,11 +186,6 @@ After both packages have been loaded, use
 =(tab-bar-groups-activate-for-tab-bar-echo-area)= to enable it.
 
 #+begin_src emacs-lisp
-(use-package tab-bar-groups
-  :ensure t
-  :config
-  (tab-bar-groups-activate)
-
-  (with-eval-after-load 'tab-bar-echo-area
-    (tab-bar-groups-activate-for-tab-bar-echo-area))
+(with-eval-after-load 'tab-bar-echo-area
+  (tab-bar-groups-activate-for-tab-bar-echo-area))
 #+end_src
