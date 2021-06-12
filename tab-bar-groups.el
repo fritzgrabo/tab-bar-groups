@@ -514,5 +514,19 @@ Requires version 0.3 of that package."
     (when (functionp 'tab-bar-echo-area-apply-display-tab-names-advice)
       (tab-bar-echo-area-apply-display-tab-names-advice))))
 
+;; --- Integration with project-mode-line-tag.el
+
+(defun tab-bar-groups--style-project-mode-line-tag (project-tag)
+  "Style PROJECT-TAG."
+  (let ((project-tag (concat project-tag)))
+    (when-let ((group-appearance (alist-get 'group-appearance (tab-bar-groups-current-tab))))
+      (font-lock-prepend-text-property 0 (length project-tag) 'face (intern (format "tab-bar-groups-tab-%s" group-appearance)) project-tag))
+    project-tag))
+
+(defun tab-bar-groups-activate-for-project-mode-line-tag ()
+  "Activate tab bar groups for the 'project-mode-line-tag' package."
+  (when (featurep 'project-mode-line-tag)
+    (add-hook 'project-mode-line-tag-style-functions #'tab-bar-groups--style-project-mode-line-tag 100)))
+
 (provide 'tab-bar-groups)
 ;;; tab-bar-groups.el ends here
