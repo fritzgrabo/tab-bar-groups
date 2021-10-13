@@ -18,7 +18,7 @@ nightly.
 
 If you use MELPA, an easy way to install this package is via
 =package-install=. Alternatively, download =tab-bar-groups.el=, put it
-it in your =load-path= and =require= it. Finally, use
+in your =load-path= and =require= it. Finally, use
 =(tab-bar-groups-activate)= or =M-x tab-bar-groups-activate= to turn on
 the provided features.
 
