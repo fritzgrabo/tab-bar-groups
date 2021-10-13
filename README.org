@@ -120,61 +120,6 @@ times:
 This package provides a range of helper functions that you can use to
 find out about existing groups, their names, etc.
 
-For an example of their use, have a look at the two functions provided
-below. I use these locally as wrappers around =project-switch-project=
-and =project-kill-buffers= to enable the "one tab group per project"
-workflow I mentioned above.
-
-In a gist, =switch-project= ...
-
-- queries the user for a project from the list of known projects,
-- derives the tab group name from either [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Directory-Local-Variables.html][dir-local variables]] named
-  =tab-bar-group-name= or =project-name=, or the project's root
-  directory name,
-- finds the tab group with that name and switches to its first tab, or,
-  if no such tab group exists,
-- creates a new tab group with that name and calls
-  =project-switch-project= to open it.
-
-=close-project= runs =project-kill-buffers=, then closes all tabs in the
-project's tab group.
-
-#+begin_src lisp
-(defun switch-project (project-dir)
-  "Switch to project in PROJECT-DIR."
-  (interactive (list (project-prompt-project-dir)))
-  (let ((tab-bar-group-name
-         (or (with-temp-buffer
-               (setq default-directory project-dir)
-               (hack-dir-local-variables-non-file-buffer)
-               (or (and (boundp 'tab-bar-group-name) tab-bar-group-name)
-                   (and (boundp 'project-name) project-name)))
-             (file-name-nondirectory (directory-file-name project-dir)))))
-    (if-let ((tab-bar-group-tabs
-              (alist-get (intern tab-bar-group-name) (tab-bar-groups-parse-groups))))
-        (tab-bar-select-tab (1+ (tab-bar--tab-index (car tab-bar-group-tabs))))
-      (tab-bar-new-tab)
-      (tab-bar-groups-store-tab-group tab-bar-group-name)
-      (project-switch-project project-dir))))
-
-(defun close-project ()
-  "Kill project buffers, close project tabs."
-  (interactive)
-  (project-kill-buffers)
-  (tab-bar-groups-close-group (tab-bar-groups-current-tab)))
-
-(use-package project
-  :demand t
-  :bind (:map project-prefix-map
-              ("p" . switch-project)
-              ("k" . close-project)))
-
-;; Add this if you use `tab-bar-echo-area'.
-(when (featurep 'tab-bar-echo-area)
-  (push #'switch-project tab-bar-echo-area-trigger-display-functions)
-  (tab-bar-echo-area-apply-display-tab-names-advice))
-#+end_src
-
 * Integration with tab-bar-echo-area
 
 This package provides an integration with the [[https://github.com/fritzgrabo/tab-bar-echo-area][tab-bar-echo-area]] package.
@@ -205,3 +150,10 @@ After both packages have been loaded, use
 (with-eval-after-load 'project-mode-line-tag
   (tab-bar-groups-activate-for-project-mode-line-tag))
 #+end_src
+
+* Related / Supplementary Packages
+
+- [[https://github.com/fritzgrabo/project-tab-groups][project-tab-groups]] to enhance the Emacs built-in [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Projects.html][project.el]] library to
+  support keeping projects isolated in named tab groups (requires Emacs
+  28).
+
