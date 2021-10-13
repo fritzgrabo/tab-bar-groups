@@ -2,7 +2,7 @@
 
 ;; Copyright (C) 2020-2021 Fritz Grabo
 
-;; Author: Fritz Grabo <me@fritzgrabo.com>
+;; Author: Fritz Grabo <hello@fritzgrabo.com>
 ;; URL: https://github.com/fritzgrabo/tab-bar-groups
 ;; Version: 0.2
 ;; Package-Requires: ((emacs "27.1") (s "1.12.0"))
